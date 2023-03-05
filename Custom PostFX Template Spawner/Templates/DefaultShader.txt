@@ -1,0 +1,19 @@
+Shader "Hidden/Custom/#NAME#"
+{
+	HLSLINCLUDE
+	#include "#NAME#.hlsl"
+	ENDHLSL
+
+	SubShader 
+	{
+		Pass 
+		{
+			Cull Off
+
+			HLSLPROGRAM
+			#pragma vertex VertDefault
+			#pragma fragment frag#NAME#
+			ENDHLSL
+		}
+	}
+}

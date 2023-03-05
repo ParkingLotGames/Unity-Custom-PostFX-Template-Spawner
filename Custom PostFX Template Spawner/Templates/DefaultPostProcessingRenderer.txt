@@ -1,0 +1,14 @@
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
+
+[ExecuteAlways]
+[AddComponentMenu("Post-processing/#SCRIPTNAME#")]
+public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME#>
+{
+    public override void Render(PostProcessRenderContext context)
+    {
+        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/#SCRIPTNAME#"));
+        sheet.properties.SetFloat("_Strength", settings.strength);
+        context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
+    }
+}

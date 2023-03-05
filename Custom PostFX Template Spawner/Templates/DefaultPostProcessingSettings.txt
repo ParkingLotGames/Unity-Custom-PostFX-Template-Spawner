@@ -1,0 +1,11 @@
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
+using System;
+
+[Serializable]
+[PostProcess(typeof(#SCRIPTNAME#Renderer), PostProcessEvent.AfterStack, "#SCRIPTNAME#")]
+public sealed class #SCRIPTNAME# : PostProcessEffectSettings
+{
+    [Range(0f, 1f), Tooltip("#SCRIPTNAME# strength.")]
+    public FloatParameter strength = new FloatParameter { value = 1f };
+}

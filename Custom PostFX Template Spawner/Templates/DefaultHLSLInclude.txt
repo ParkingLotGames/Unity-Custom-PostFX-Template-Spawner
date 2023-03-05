@@ -1,0 +1,9 @@
+#include "Common.hlsl"
+
+float4 frag#NAME#(VaryingsDefault i) : SV_Target
+{
+	float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
+	float4 finalColor = 1 - color;
+	color = lerp(color, finalColor, _Strength);
+	return color;
+}

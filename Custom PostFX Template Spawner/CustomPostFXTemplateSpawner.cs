@@ -71,8 +71,10 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         if (!Directory.Exists(shadersFolder))
             Directory.CreateDirectory(shadersFolder);
 
-        // Generate unique names for the effect files
+        // Get name without spaces
         string effectNameWithoutSpaces = effectName.Replace(" ", "");
+
+        // Generate unique names for the effect files
         string settingsFileName = GenerateUniqueFileName(settingsFolder, $"{effectNameWithoutSpaces}.cs");
         string rendererFileName = GenerateUniqueFileName(renderersFolder, $"{effectNameWithoutSpaces}Renderer.cs");
         string shaderFileName = GenerateUniqueFileName(shadersFolder, $"{effectNameWithoutSpaces}.shader");
@@ -85,10 +87,14 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         string hlslTemplateText = File.ReadAllText(hlslTemplatePath);
 
         // Replace the placeholders in the template texts with the effect name
-        settingsTemplateText = settingsTemplateText.Replace("#SCRIPTNAME#", effectName);
-        rendererTemplateText = rendererTemplateText.Replace("#SCRIPTNAME#", effectName);
-        shaderTemplateText = shaderTemplateText.Replace("#NAME#", effectName);
-        hlslTemplateText = hlslTemplateText.Replace("#NAME#", effectName);
+        settingsTemplateText = settingsTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
+        settingsTemplateText = settingsTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
+        rendererTemplateText = rendererTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
+        rendererTemplateText = rendererTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
+        shaderTemplateText = shaderTemplateText.Replace("#NAME#", effectNameWithoutSpaces   );
+        shaderTemplateText = shaderTemplateText.Replace("#SPACENAME#", effectName);
+        hlslTemplateText = hlslTemplateText.Replace("#NAME#", effectNameWithoutSpaces);
+        hlslTemplateText = hlslTemplateText.Replace("#SPACENAME#", effectName);
 
         // Write the files
         await Task.WhenAll(

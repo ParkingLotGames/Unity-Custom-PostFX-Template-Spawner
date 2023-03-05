@@ -3,7 +3,7 @@ using UnityEngine.Rendering.PostProcessing;
 using System;
 
 [Serializable]
-[PostProcess(typeof(#SCRIPTNAME#Renderer), PostProcessEvent.AfterStack, "#SCRIPTNAME#")]
+[PostProcess(typeof(#SCRIPTNAME#Renderer), PostProcessEvent.AfterStack, "#SPACESCRIPTNAME#")]
 public sealed class #SCRIPTNAME# : PostProcessEffectSettings
 {
     [Range(0f, 1f), Tooltip("#SCRIPTNAME# strength.")]

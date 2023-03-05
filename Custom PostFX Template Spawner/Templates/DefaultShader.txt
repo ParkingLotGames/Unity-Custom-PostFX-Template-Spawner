@@ -1,4 +1,4 @@
-Shader "Hidden/Custom/#NAME#"
+Shader "Hidden/Custom/#SPACENAME#"
 {
 	HLSLINCLUDE
 	#include "#NAME#.hlsl"

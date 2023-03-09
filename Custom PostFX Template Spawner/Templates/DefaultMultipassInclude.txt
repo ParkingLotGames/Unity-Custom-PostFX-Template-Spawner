@@ -1,0 +1,25 @@
+#include "Common.cginc"
+
+float4 frag#NAME#(v2f i) : SV_Target
+{
+	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
+	float4 finalColor = 1 - color;
+	color = lerp(color, finalColor, _Contribution);
+	return color;
+}
+
+float4 ffrag#NAME#SecondPass(v2f i) : SV_Target
+{
+	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
+	float4 finalColor = 1 - color;
+	color = lerp(color, finalColor, _Contribution);
+	return color;
+}
+
+float4 ffrag#NAME#ThirdPass(v2f i) : SV_Target
+{
+	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
+	float4 finalColor = 1 - color;
+	color = lerp(color, finalColor, _Contribution);
+	return color;
+}

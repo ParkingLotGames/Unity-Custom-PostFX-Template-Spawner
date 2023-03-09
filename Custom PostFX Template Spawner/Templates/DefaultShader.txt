@@ -1,18 +1,14 @@
 Shader "Hidden/Custom/#SPACENAME#"
 {
-	HLSLINCLUDE
-	#include "#NAME#.hlsl"
-	ENDHLSL
-
 	SubShader 
 	{
+		Cull Off ZWrite Off ZTest Always
 		Pass 
 		{
-			Cull Off
-
 			HLSLPROGRAM
 			#pragma vertex VertDefault
 			#pragma fragment frag#NAME#
+			#include "include/#NAME#.hlsl"
 			ENDHLSL
 		}
 	}

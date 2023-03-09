@@ -1,0 +1,32 @@
+Shader "Hidden/Custom/Cg #SPACENAME#"
+{
+	CGINCLUDE
+	#include "include/Cg#NAME#.cginc"
+	ENDCG
+
+	SubShader 
+	{
+		Cull Off ZWrite Off ZTest Always
+		Pass 
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag#NAME#FirstPass
+			ENDCG
+		}
+		Pass 
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag#NAME#SecondPass
+			ENDCG
+		}
+		Pass 
+		{
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag#NAME#ThirdPass
+			ENDCG
+		}
+	}
+}

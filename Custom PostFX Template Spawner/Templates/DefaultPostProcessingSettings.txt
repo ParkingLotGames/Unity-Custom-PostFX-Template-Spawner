@@ -6,6 +6,6 @@ using System;
 [PostProcess(typeof(#SCRIPTNAME#Renderer), PostProcessEvent.AfterStack, "#SPACESCRIPTNAME#")]
 public sealed class #SCRIPTNAME# : PostProcessEffectSettings
 {
-    [Range(0f, 1f), Tooltip("#SCRIPTNAME# strength.")]
-    public FloatParameter strength = new FloatParameter { value = 1f };
+    [Range(0f, 1f), Tooltip("#SCRIPTNAME# contribution.")]
+    public FloatParameter contribution = new FloatParameter { value = 1f };
 }

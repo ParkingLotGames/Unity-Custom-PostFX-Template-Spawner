@@ -2,14 +2,14 @@ using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
 [ExecuteAlways]
-[AddComponentMenu("Post-processing/#SPACESCRIPTNAME#")]
-public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME#>
+[AddComponentMenu("Post-processing/Cg #SPACESCRIPTNAME#")]
+public sealed class Cg#SCRIPTNAME#Renderer : PostProcessEffectRenderer<Cg#SCRIPTNAME#>
 {
     readonly int contributionID = Shader.PropertyToID("_Contribution");
 
     public override void Render(PostProcessRenderContext context)
     {
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/#SPACESCRIPTNAME#"));
+        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Cg #SPACESCRIPTNAME#"));
         sheet.properties.SetFloat(contributionID, settings.contribution);
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
     }

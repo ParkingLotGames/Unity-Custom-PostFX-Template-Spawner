@@ -5,13 +5,35 @@ using UnityEngine;
 
 public class CustomPostFXTemplateSpawner : EditorWindow
 {
-    private string effectsFolder = "";
-    private string effectName = "New Effect";
+    enum EffectTypes
+    {
+        Default = 0,
+        Cg = 1,
+        Multipass = 2,
+    }
+    string effectsFolder = "Assets/Postprocessing";
+    string effectName = "New Effect";
+    EffectTypes effectType = new EffectTypes();
 
-    [MenuItem("Tools/PostFX Template Spawner/Create New Effect")]
+    readonly string settingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingSettings.txt";
+    readonly string cgSettingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGPostProcessingSettings.txt";
+    readonly string rendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingRenderer.txt";
+    readonly string cgRendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGPostProcessingRenderer.txt";
+    readonly string multiPassRendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultMultipassPostProcessingRenderer.txt";
+    readonly string shaderTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultShader.txt";
+    readonly string cgShaderTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGShader.txt";
+    readonly string multiPassShaderTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultMultipassShader.txt";
+    readonly string hlslIncludeTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultHLSLInclude.txt";
+    readonly string cgIncludeTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGInclude.txt";
+    readonly string multiPassIncludeTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultMultipassInclude.txt";
+    readonly string cgCommonTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGCommon.txt";
+    readonly string hlslCommonTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultHLSLCommon.txt";
+
+    [MenuItem("Assets/Create/Post Processing/Custom Effect", priority = 60)]
+    [MenuItem("Tools/Post Processing/Create New Custom Effect")]
     static void Init()
     {
-        CustomPostFXTemplateSpawner window = (CustomPostFXTemplateSpawner)GetWindow(typeof(CustomPostFXTemplateSpawner), true, "New Custom Post Processing Effect");
+        CustomPostFXTemplateSpawner window = (CustomPostFXTemplateSpawner)GetWindow(typeof(CustomPostFXTemplateSpawner), true, "Create New Custom Post Processing Stack V3 Effect");
         window.Show();
     }
 
@@ -36,6 +58,11 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        GUILayout.Label("Effect type", GUILayout.Width(EditorGUIUtility.labelWidth));
+        effectType = (EffectTypes)EditorGUILayout.EnumPopup(effectType);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
         GUILayout.Label("Effect name", GUILayout.Width(EditorGUIUtility.labelWidth));
         effectName = EditorGUILayout.TextField(effectName);
         GUILayout.EndHorizontal();
@@ -47,61 +74,91 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         if (GUILayout.Button("Create", GUILayout.Width(80)))
         {
             CreateEffect();
-            Close();
         }
         GUILayout.EndHorizontal();
     }
 
     async void CreateEffect()
     {
+        string settingsFileName = "";
+        string rendererFileName = "";
+        string shaderFileName = "";
+        string includeFileName = "";
+        string commonFileName = "";
 
-        string settingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingSettings.txt";
-        string rendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingRenderer.txt";
-        string shaderTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultShader.txt";
-        string hlslTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultHLSLInclude.txt";
-
+        string settingsTemplateText = "";
+        string rendererTemplateText = "";
+        string shaderTemplateText = "";
+        string includeTemplateText = "";
+        string commonTemplateText = "";
         // Create the folders if they don't exist
         string settingsFolder = $"{effectsFolder}/Settings";
         string renderersFolder = $"{effectsFolder}/Renderers";
         string shadersFolder = $"{effectsFolder}/Shaders";
+        string includeFolder = $"{effectsFolder}/Shaders/include";
         if (!Directory.Exists(settingsFolder))
             Directory.CreateDirectory(settingsFolder);
         if (!Directory.Exists(renderersFolder))
             Directory.CreateDirectory(renderersFolder);
         if (!Directory.Exists(shadersFolder))
             Directory.CreateDirectory(shadersFolder);
+        if (!Directory.Exists(includeFolder))
+            Directory.CreateDirectory(includeFolder);
 
         // Get name without spaces
         string effectNameWithoutSpaces = effectName.Replace(" ", "");
 
         // Generate unique names for the effect files
-        string settingsFileName = GenerateUniqueFileName(settingsFolder, $"{effectNameWithoutSpaces}.cs");
-        string rendererFileName = GenerateUniqueFileName(renderersFolder, $"{effectNameWithoutSpaces}Renderer.cs");
-        string shaderFileName = GenerateUniqueFileName(shadersFolder, $"{effectNameWithoutSpaces}.shader");
-        string hlslFileName = GenerateUniqueFileName(shadersFolder, $"{effectNameWithoutSpaces}.hlsl");
-
+        settingsFileName = GenerateUniqueFileName(settingsFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.cs");
+        rendererFileName = GenerateUniqueFileName(renderersFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}Renderer.cs");
+        shaderFileName = GenerateUniqueFileName(shadersFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.shader");
+        includeFileName = GenerateUniqueFileName(includeFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.{(effectType == EffectTypes.Default ? "hlsl" : "cginc")}");
+        commonFileName = $"Common.{(effectType == EffectTypes.Default ? "hlsl" : "cginc")}";
+        Debug.Log(commonFileName);
+        if (!File.Exists($"{includeFolder}/{commonFileName}"))
+        {
+            commonTemplateText = File.ReadAllText(effectType == EffectTypes.Default ? hlslCommonTemplatePath : cgCommonTemplatePath);
+            await Task.WhenAll(WriteFileAsync(includeFolder, commonFileName, commonTemplateText));
+        }
         // Read the template files
-        string settingsTemplateText = File.ReadAllText(settingsTemplatePath);
-        string rendererTemplateText = File.ReadAllText(rendererTemplatePath);
-        string shaderTemplateText = File.ReadAllText(shaderTemplatePath);
-        string hlslTemplateText = File.ReadAllText(hlslTemplatePath);
+        switch (effectType)
+        {
+            case EffectTypes.Default:
+                rendererTemplateText = File.ReadAllText(rendererTemplatePath);
+                settingsTemplateText = File.ReadAllText(settingsTemplatePath);
+                shaderTemplateText = File.ReadAllText(shaderTemplatePath);
+                includeTemplateText = File.ReadAllText(hlslIncludeTemplatePath);
+                break;
+            case EffectTypes.Cg:
+                rendererTemplateText = File.ReadAllText(cgRendererTemplatePath);
+                settingsTemplateText = File.ReadAllText(cgSettingsTemplatePath);
+                shaderTemplateText = File.ReadAllText(cgShaderTemplatePath);
+                includeTemplateText = File.ReadAllText(cgIncludeTemplatePath);
+                break;
+            case EffectTypes.Multipass:
+                rendererTemplateText = File.ReadAllText(multiPassRendererTemplatePath);
+                settingsTemplateText = File.ReadAllText(cgSettingsTemplatePath);
+                shaderTemplateText = File.ReadAllText(multiPassShaderTemplatePath);
+                includeTemplateText = File.ReadAllText(multiPassIncludeTemplatePath);
+                break;
+        }
 
         // Replace the placeholders in the template texts with the effect name
         settingsTemplateText = settingsTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
         settingsTemplateText = settingsTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
         rendererTemplateText = rendererTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
         rendererTemplateText = rendererTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
-        shaderTemplateText = shaderTemplateText.Replace("#NAME#", effectNameWithoutSpaces   );
+        shaderTemplateText = shaderTemplateText.Replace("#NAME#", effectNameWithoutSpaces);
         shaderTemplateText = shaderTemplateText.Replace("#SPACENAME#", effectName);
-        hlslTemplateText = hlslTemplateText.Replace("#NAME#", effectNameWithoutSpaces);
-        hlslTemplateText = hlslTemplateText.Replace("#SPACENAME#", effectName);
+        includeTemplateText = includeTemplateText.Replace("#NAME#", effectNameWithoutSpaces);
+        includeTemplateText = includeTemplateText.Replace("#SPACENAME#", effectName);
 
         // Write the files
         await Task.WhenAll(
         WriteFileAsync(settingsFolder, settingsFileName, settingsTemplateText),
         WriteFileAsync(renderersFolder, rendererFileName, rendererTemplateText),
         WriteFileAsync(shadersFolder, shaderFileName, shaderTemplateText),
-        WriteFileAsync(shadersFolder, hlslFileName, hlslTemplateText)
+        WriteFileAsync(includeFolder, includeFileName, includeTemplateText)
         );
 
         // Refresh the asset database

@@ -1,8 +1,8 @@
 {
   "name": "com.parkinglotgames.custom-postfx-template-spawner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Custom PostFX Template Spawner",
-  "description": "Editor Wizard tool that spawns all required files to create a Post-Processing V3 Effect.",
+  "description": "A productivity Editor tool that creates all required boilerplate required for custom Post-Processing Stack V3 Effects with a single click.",
   "unity": "2019.1",
   "unityRelease": "1f0",
   "documentationUrl": "https://github.com/ParkingLotGames/Unity-Custom-PostFX-Template-Spawner",

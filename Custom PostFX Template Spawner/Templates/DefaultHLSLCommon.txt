@@ -1,0 +1,21 @@
+#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
+TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
+float4 _MainTex_TexelSize;
+float _Contribution;
+
+VaryingsDefault vertDefaultPostFX(AttributesDefault v) 
+{
+	VaryingsDefault o;
+	o.vertex = UnityObjectToClipPos(v.vertex);
+	o.texcoord = TransformTriangleVertexToUV(v.vertex.xy);
+	return o;
+}
+ 
+float4 UnityObjectToClipPos(float3 vertex)
+{
+#if defined(UNITY_SINGLE_PASS_STEREO) || defined(UNITY_USE_CONCATENATED_MATRICES)
+	return mul(unity_MatrixVP, mul(unity_ObjectToWorld, float4(vertex, 1)));
+#else
+	return mul(mul(unity_MatrixVP, unity_ObjectToWorld), float4(vertex, 1)); 
+#endif
+}

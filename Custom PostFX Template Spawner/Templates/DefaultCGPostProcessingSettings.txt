@@ -1,0 +1,11 @@
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
+using System;
+
+[Serializable]
+[PostProcess(typeof(Cg#SCRIPTNAME#Renderer), PostProcessEvent.AfterStack, "Cg #SPACESCRIPTNAME#")]
+public sealed class Cg#SCRIPTNAME# : PostProcessEffectSettings
+{
+    [Range(0f, 1f), Tooltip("Cg#SCRIPTNAME# contribution.")]
+    public FloatParameter contribution = new FloatParameter { value = 1f };
+}

@@ -5,7 +5,7 @@
 
 ![Issues](https://img.shields.io/github/issues-raw/ParkingLotGames/Unity-Custom-PostFX-Template-Spawner?style=plastic) ![Pull requests](https://img.shields.io/github/issues-pr-raw/ParkingLotGames/Unity-Custom-PostFX-Template-Spawner?style=plastic)
 
-Editor Wizard tool that spawns all required files to create a Post-Processing V3 Effect
+A productivity Editor tool that creates all required boilerplate required for custom Post-Processing Stack V3 Effects with a single click.
 
 # //TODO
 

@@ -1,25 +1,40 @@
 #include "Common.cginc"
-
-float4 frag#NAME#(v2f i) : SV_Target
+// First pass: Tint left third of screen red
+float4 frag#NAME#FirstPass(v2f i) : SV_Target
 {
-	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
-	float4 finalColor = 1 - color;
+	float4 color = tex2D(_MainTex, i.uv);
+	float4 finalColor = color;
+
+	if (i.uv.x <= 0.3333) { // if pixel is in the left third of the screen
+		finalColor *= float4(1.0, 0.0, 0.0, 1.0); // tint red
+	}
+
+	color = lerp(color, finalColor, _Contribution);
+	return color;
+}
+// Second pass: Tint middle third of screen green
+float4 frag#NAME#SecondPass(v2f i) : SV_Target
+{
+	float4 color = tex2D(_MainTex, i.uv);
+	float4 finalColor = color;
+
+	if (i.uv.x > 0.3333 && i.uv.x <= 0.6666) { // if pixel is in the middle third of the screen
+		finalColor *= float4(0.0, 1.0, 0.0, 1.0); // tint green
+	}
+
 	color = lerp(color, finalColor, _Contribution);
 	return color;
 }
 
-float4 ffrag#NAME#SecondPass(v2f i) : SV_Target
+float4 frag#NAME#ThirdPass(v2f i) : SV_Target
 {
-	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
-	float4 finalColor = 1 - color;
-	color = lerp(color, finalColor, _Contribution);
-	return color;
-}
+	float4 color = tex2D(_MainTex, i.uv);
+	float4 finalColor = color;
 
-float4 ffrag#NAME#ThirdPass(v2f i) : SV_Target
-{
-	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
-	float4 finalColor = 1 - color;
+	if (i.uv.x > 0.6666) { // if pixel is in the right third of the screen
+		finalColor *= float4(0.0, 0.0, 1.0, 1.0); // tint blue
+	}
+
 	color = lerp(color, finalColor, _Contribution);
 	return color;
 }

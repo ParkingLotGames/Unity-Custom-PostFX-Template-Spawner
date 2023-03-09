@@ -1,16 +1,20 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-[ExecuteAlways]
-[AddComponentMenu("Post-processing/Cg #SPACESCRIPTNAME#")]
-public sealed class Cg#SCRIPTNAME#Renderer : PostProcessEffectRenderer<Cg#SCRIPTNAME#>
+public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME#>
 {
     readonly int contributionID = Shader.PropertyToID("_Contribution");
+    Material #CAMELSCRIPTNAME#Material;
+
+    public override void Init()
+    {
+        Shader #CAMELSCRIPTNAME#Shader = Shader.Find("Hidden/Custom/#SPACESCRIPTNAME#");
+        #CAMELSCRIPTNAME#Material = new Material(#CAMELSCRIPTNAME#Shader);
+    }
 
     public override void Render(PostProcessRenderContext context)
     {
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Cg #SPACESCRIPTNAME#"));
-        sheet.properties.SetFloat(contributionID, settings.contribution);
-        context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
+        #CAMELSCRIPTNAME#Material.SetFloat(contributionID, settings.contribution);
+        context.command.Blit(context.source, context.destination, #CAMELSCRIPTNAME#Material, 0);
     }
 }

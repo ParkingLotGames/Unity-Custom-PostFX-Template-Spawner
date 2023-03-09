@@ -12,11 +12,12 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         Multipass = 2,
     }
     string effectsFolder = "Assets/Postprocessing";
-    string effectName = "New Effect";
+    string effectName = "New PPV3 Effect";
     EffectTypes effectType = new EffectTypes();
 
     readonly string settingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingSettings.txt";
     readonly string cgSettingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGPostProcessingSettings.txt";
+    readonly string multiPassSettingsTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultMultipassPostProcessingSettings.txt";
     readonly string rendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultPostProcessingRenderer.txt";
     readonly string cgRendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultCGPostProcessingRenderer.txt";
     readonly string multiPassRendererTemplatePath = "Packages/com.parkinglotgames.custom-postfx-template-spawner/Custom PostFX Template Spawner/Templates/DefaultMultipassPostProcessingRenderer.txt";
@@ -62,6 +63,18 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         effectType = (EffectTypes)EditorGUILayout.EnumPopup(effectType);
         GUILayout.EndHorizontal();
 
+        switch (effectType)
+        {
+            case EffectTypes.Default:        
+                effectName = "New Effect";
+                break;
+            case EffectTypes.Cg:
+                effectName = "New Cg Effect";
+                break;
+            case EffectTypes.Multipass:
+                effectName = "New Multipass Effect";
+                break;
+        }
         GUILayout.BeginHorizontal();
         GUILayout.Label("Effect name", GUILayout.Width(EditorGUIUtility.labelWidth));
         effectName = EditorGUILayout.TextField(effectName);
@@ -107,14 +120,15 @@ public class CustomPostFXTemplateSpawner : EditorWindow
 
         // Get name without spaces
         string effectNameWithoutSpaces = effectName.Replace(" ", "");
+        string effectNameCamelCase = ToCamelCase(effectNameWithoutSpaces);
 
         // Generate unique names for the effect files
-        settingsFileName = GenerateUniqueFileName(settingsFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.cs");
-        rendererFileName = GenerateUniqueFileName(renderersFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}Renderer.cs");
-        shaderFileName = GenerateUniqueFileName(shadersFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.shader");
-        includeFileName = GenerateUniqueFileName(includeFolder, $"{(effectType == EffectTypes.Default ? "" : "Cg") + effectNameWithoutSpaces}.{(effectType == EffectTypes.Default ? "hlsl" : "cginc")}");
+        settingsFileName = GenerateUniqueFileName(settingsFolder, $"{effectNameWithoutSpaces}.cs");
+        rendererFileName = GenerateUniqueFileName(renderersFolder, $"{(effectType == EffectTypes.Cg ? "Cg" : "") + effectNameWithoutSpaces}Renderer.cs");
+        shaderFileName = GenerateUniqueFileName(shadersFolder, $"{(effectType == EffectTypes.Cg ? "Cg" : "") + effectNameWithoutSpaces}.shader");
+        includeFileName = GenerateUniqueFileName(includeFolder, $"{effectNameWithoutSpaces}.{(effectType == EffectTypes.Default ? "hlsl" : "cginc")}");
         commonFileName = $"Common.{(effectType == EffectTypes.Default ? "hlsl" : "cginc")}";
-        Debug.Log(commonFileName);
+
         if (!File.Exists($"{includeFolder}/{commonFileName}"))
         {
             commonTemplateText = File.ReadAllText(effectType == EffectTypes.Default ? hlslCommonTemplatePath : cgCommonTemplatePath);
@@ -137,7 +151,7 @@ public class CustomPostFXTemplateSpawner : EditorWindow
                 break;
             case EffectTypes.Multipass:
                 rendererTemplateText = File.ReadAllText(multiPassRendererTemplatePath);
-                settingsTemplateText = File.ReadAllText(cgSettingsTemplatePath);
+                settingsTemplateText = File.ReadAllText(multiPassSettingsTemplatePath);
                 shaderTemplateText = File.ReadAllText(multiPassShaderTemplatePath);
                 includeTemplateText = File.ReadAllText(multiPassIncludeTemplatePath);
                 break;
@@ -147,6 +161,7 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         settingsTemplateText = settingsTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
         settingsTemplateText = settingsTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
         rendererTemplateText = rendererTemplateText.Replace("#SCRIPTNAME#", effectNameWithoutSpaces);
+        rendererTemplateText = rendererTemplateText.Replace("#CAMELSCRIPTNAME#", effectNameCamelCase);
         rendererTemplateText = rendererTemplateText.Replace("#SPACESCRIPTNAME#", effectName);
         shaderTemplateText = shaderTemplateText.Replace("#NAME#", effectNameWithoutSpaces);
         shaderTemplateText = shaderTemplateText.Replace("#SPACENAME#", effectName);
@@ -183,6 +198,16 @@ public class CustomPostFXTemplateSpawner : EditorWindow
         {
             return fileName;
         }
+    }
+
+    string ToCamelCase(string input)
+    {
+        if (input.Length > 0)
+        {
+            input = char.ToLower(input[0]) + input.Substring(1);
+        }
+
+        return input;
     }
 
     async Task WriteFileAsync(string folder, string fileName, string content)

@@ -1,7 +1,13 @@
-Shader "Hidden/Custom/Cg #SPACENAME#"
+Shader "Hidden/Custom/#SPACENAME#"
 {
+	Properties
+	{
+		_MainTex("Color Buffer", 2D) = "white" {}
+		_IntermediateTex("Intermediate (RGB)", 2D) = "white" {}
+	}
+
 	CGINCLUDE
-	#include "include/Cg#NAME#.cginc"
+	#include "include/#NAME#.cginc"
 	ENDCG
 
 	SubShader 

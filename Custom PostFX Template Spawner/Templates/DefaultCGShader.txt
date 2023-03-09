@@ -1,4 +1,4 @@
-Shader "Hidden/Custom/Cg #SPACENAME#"
+Shader "Hidden/Custom/#SPACENAME#"
 {
 	SubShader 
 	{
@@ -8,7 +8,7 @@ Shader "Hidden/Custom/Cg #SPACENAME#"
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag#NAME#
-			#include "include/Cg#NAME#.cginc"
+			#include "include/#NAME#.cginc"
 			ENDCG
 		}
 	}

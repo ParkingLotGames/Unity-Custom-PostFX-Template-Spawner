@@ -1,8 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-[ExecuteAlways]
-[AddComponentMenu("Post-processing/#SPACESCRIPTNAME#")]
 public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME#>
 {
     readonly int contributionID = Shader.PropertyToID("_Contribution");

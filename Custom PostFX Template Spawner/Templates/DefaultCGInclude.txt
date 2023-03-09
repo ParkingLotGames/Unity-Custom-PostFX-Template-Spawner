@@ -2,7 +2,7 @@
 
 float4 frag#NAME#(v2f i) : SV_Target
 {
-	float4 color = tex2D(_MainTex, sampler_MainTex, i.uv);
+	float4 color = tex2D(_MainTex, i.uv);
 	float4 finalColor = 1 - color;
 	color = lerp(color, finalColor, _Contribution);
 	return color;

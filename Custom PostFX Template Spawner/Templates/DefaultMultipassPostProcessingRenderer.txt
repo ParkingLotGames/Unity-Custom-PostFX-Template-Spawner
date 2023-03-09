@@ -1,16 +1,43 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-[ExecuteAlways]
-[AddComponentMenu("Post-processing/Cg #SPACESCRIPTNAME#")]
-public sealed class Cg#SCRIPTNAME#Renderer : PostProcessEffectRenderer<Cg#SCRIPTNAME#>
+public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME#>
 {
     readonly int contributionID = Shader.PropertyToID("_Contribution");
+    RenderTexture intermediateRT, temporaryRT;
+    Material #CAMELSCRIPTNAME#Material;
 
+    public override void Init()
+    {
+        Shader #CAMELSCRIPTNAME#Shader = Shader.Find("Hidden/Custom/#SPACESCRIPTNAME#");
+        #CAMELSCRIPTNAME#Material = new Material(#CAMELSCRIPTNAME#Shader);
+    }
     public override void Render(PostProcessRenderContext context)
     {
-        var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Cg #SPACESCRIPTNAME#"));
-        sheet.properties.SetFloat(contributionID, settings.contribution);
-        context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
+        // I suggest removing this boolean check once the effect is finished and handle debug views with shader preprocessor directives 
+        if (!settings.debug)
+        {
+            int contributionRTWidth = Mathf.RoundToInt(context.width /*/ 4f*/);
+            int contributionRTHeight = Mathf.RoundToInt(context.height /*/ 4f*/);
+            RenderTextureDescriptor contributionRTDescriptor = new RenderTextureDescriptor(contributionRTWidth, contributionRTHeight);
+            RenderTextureDescriptor temporaryRTDescriptor = new RenderTextureDescriptor(contributionRTWidth, contributionRTHeight);
+            contributionRTDescriptor.colorFormat = RenderTextureFormat.DefaultHDR;
+            contributionRTDescriptor.depthBufferBits = 0;
+        
+            #CAMELSCRIPTNAME#Material.SetFloat(contributionID, settings.contribution);
+
+            temporaryRT = RenderTexture.GetTemporary(contributionRTDescriptor);
+            context.command.Blit(context.source, temporaryRT, #CAMELSCRIPTNAME#Material, 0);
+
+            intermediateRT = RenderTexture.GetTemporary(contributionRTDescriptor);
+            context.command.Blit(temporaryRT, intermediateRT, #CAMELSCRIPTNAME#Material, 1);
+            
+            context.command.Blit(intermediateRT, context.destination, #CAMELSCRIPTNAME#Material, 2);
+
+            RenderTexture.ReleaseTemporary(intermediateRT);
+            RenderTexture.ReleaseTemporary(temporaryRT);
+        }
+        else
+            context.command.Blit(context.source, context.destination, #CAMELSCRIPTNAME#Material, settings.passToDebug);
     }
 }

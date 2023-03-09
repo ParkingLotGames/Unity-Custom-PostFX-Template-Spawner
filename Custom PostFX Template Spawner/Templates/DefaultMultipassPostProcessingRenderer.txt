@@ -14,6 +14,8 @@ public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME
     }
     public override void Render(PostProcessRenderContext context)
     {
+        #CAMELSCRIPTNAME#Material.SetFloat(contributionID, settings.contribution);
+
         // I suggest removing this boolean check once the effect is finished and handle debug views with shader preprocessor directives 
         if (!settings.debug)
         {
@@ -23,8 +25,6 @@ public sealed class #SCRIPTNAME#Renderer : PostProcessEffectRenderer<#SCRIPTNAME
             RenderTextureDescriptor temporaryRTDescriptor = new RenderTextureDescriptor(contributionRTWidth, contributionRTHeight);
             contributionRTDescriptor.colorFormat = RenderTextureFormat.DefaultHDR;
             contributionRTDescriptor.depthBufferBits = 0;
-        
-            #CAMELSCRIPTNAME#Material.SetFloat(contributionID, settings.contribution);
 
             temporaryRT = RenderTexture.GetTemporary(contributionRTDescriptor);
             context.command.Blit(context.source, temporaryRT, #CAMELSCRIPTNAME#Material, 0);

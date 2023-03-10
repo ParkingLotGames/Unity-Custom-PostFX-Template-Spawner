@@ -10,9 +10,9 @@ A productivity Editor tool that creates all required boilerplate for custom Post
 
 ## Installation 
 ### Package manifest
-* Add the following to your manifest.json:
+* Add the following to your manifest.json under "dependencies":
 
-```"com.parkinglotgames.custom-postfx-template-spawner": "1.1.0"```
+```"com.parkinglotgames.custom-postfx-template-spawner": "1.1.0",```
 
 ### Git URL
 * In Unity, go to Window > Package Manager > "+" button > "Add package from git URL..." and enter:

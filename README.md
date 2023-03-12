@@ -6,7 +6,8 @@
 
 A productivity Editor tool that creates all required boilerplate for custom Post-Processing Stack V3 Effects with a single click.
 
-![](https://parkinglotgames.top/postfx_template_demo.webp)
+https://user-images.githubusercontent.com/76890242/224581300-465aa960-8da4-4755-816d-e0a95cdedd40.webm
+
 
 ## Installation 
 ### Package manifest
